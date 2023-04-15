@@ -1,7 +1,7 @@
 {
   "name": "commitwhisperer",
   "displayName": "CommitWhisperer",
-  "description": "Lorem ipsum",
+  "description": "CommitWhisperer creates concise Git commit messages in Visual Studio Code using OpenAI technology.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.77.0"
