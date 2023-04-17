@@ -3,6 +3,7 @@ import { OpenAIApi, Configuration } from 'openai';
 import { GitExtension, Repository } from './git.d';
 const CONFIGURATION_NAME = 'generateCommitMessage';
 const OPENAPI_KEY_NAME = 'openaiApiKey';
+const COMMIT_TYPES = 'commitTypes';
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.generateCommitMessage', async () => {
@@ -11,7 +12,8 @@ export function activate(context: vscode.ExtensionContext) {
       const gitDiff = await getGitDiff(gitRepository);
 
       if (isDiffAvailable(gitDiff)) { 
-        const message = await generateCommitMessage(gitDiff);
+        const commitType = await selectCommitType();
+        const message = await generateCommitMessage(gitDiff, commitType);
         await openSourceControlView();
         writeCommitMessageToInputBox(gitRepository, message);
       } else {
@@ -66,7 +68,25 @@ function isDiffAvailable(gitDiff: string | undefined) {
   return !!gitDiff;
 }
 
-async function generateCommitMessage(gitDiff: string | undefined) {
+async function selectCommitType() {
+  const commitTypes = vscode.workspace.getConfiguration(CONFIGURATION_NAME).get<string[]>(COMMIT_TYPES) || [];
+
+  if (commitTypes.length === 0) {
+    return '';
+  }
+
+  const selectedType = await vscode.window.showQuickPick(['Auto Detection', ...commitTypes], {
+    placeHolder: 'Select a commit type',
+  });
+
+  if (selectedType === 'Auto Detection') { 
+    return '';
+  }
+
+  return `Use the following commit type for this message: ${selectedType}.`;
+}
+
+async function generateCommitMessage(gitDiff: string | undefined, commitType: string) {
   const configuration = new Configuration({
     apiKey: vscode.workspace.getConfiguration(CONFIGURATION_NAME).get(OPENAPI_KEY_NAME),
   });
@@ -77,7 +97,7 @@ async function generateCommitMessage(gitDiff: string | undefined) {
   const customPrompt = getCustomPrompt();
   const openAIResponse = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: prompt + ' ' + customPrompt + '\n\nTask information:' + gitDiff,
+    prompt: `${prompt} ${commitType} ${customPrompt}\n\n###\n\n${gitDiff}`,
     temperature: 0.6,
     max_tokens: 256,
     top_p: 1,
@@ -85,12 +105,16 @@ async function generateCommitMessage(gitDiff: string | undefined) {
     presence_penalty: 0,
   });
 
-  return openAIResponse.data.choices[0].text?.trim();
+  return removeBackticks(openAIResponse.data.choices[0].text?.trim());
 }
 
 function getCustomPrompt() {
   const customPrompt = vscode.workspace.getConfiguration('generateCommitMessage').get('commitMessagePrompt');
   return customPrompt || '';
+}
+
+function removeBackticks(message: string = '') {
+  return message.replace(/^`|`$/g, '');
 }
 
 async function openSourceControlView() {

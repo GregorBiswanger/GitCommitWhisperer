@@ -29,8 +29,16 @@
         },
         "generateCommitMessage.commitMessagePrompt": {
           "type": "string",
-          "default": "Create a commit message based on the following git diff:",
-          "description": "The prompt for generating commit messages"
+          "default": "",
+          "description": "Additional prompt for generating the Git message"
+        },
+        "generateCommitMessage.commitTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"],
+          "description": "List of Git commit types to choose from when generating commit messages."
         }
       }
     }
