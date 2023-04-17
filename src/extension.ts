@@ -1,17 +1,48 @@
 import * as vscode from 'vscode';
 import { OpenAIApi, Configuration } from 'openai';
 import { GitExtension, Repository } from './git.d';
+const CONFIGURATION_NAME = 'generateCommitMessage';
+const OPENAPI_KEY_NAME = 'openaiApiKey';
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.generateCommitMessage', async () => {
-    const gitRepository = getGitRepository();
-    const gitDiff = await gitRepository?.diff(true);
-    const message = await generateCommitMessage(gitDiff);
-    await openSourceControlView();
-    writeCommitMessageToInputBox(gitRepository, message);
+    if (await isOpenIdKeyAvailableInSettings()) {
+      const gitRepository = getGitRepository();
+      const gitDiff = await gitRepository?.diff(true);
+      const message = await generateCommitMessage(gitDiff);
+      await openSourceControlView();
+      writeCommitMessageToInputBox(gitRepository, message);
+    } else {
+      if (await promptAndSaveOpenIdKey()) {
+        vscode.commands.executeCommand('extension.generateCommitMessage');
+      }
+    }
   });
 
   context.subscriptions.push(disposable);
+}
+
+async function isOpenIdKeyAvailableInSettings() {
+  const openaiApiKey = vscode.workspace.getConfiguration(CONFIGURATION_NAME).get(OPENAPI_KEY_NAME);
+  return !!openaiApiKey;
+}
+
+async function promptAndSaveOpenIdKey() {
+  const input = await vscode.window.showInputBox({
+    prompt: 'Please enter your OpenID key:',
+    ignoreFocusOut: true,
+  });
+
+  if (input === undefined || input.trim() === '') {
+    vscode.window.showErrorMessage('No OpenID key was entered. The extension will not run.');
+    return false;
+  } else {
+    await vscode.workspace
+      .getConfiguration(CONFIGURATION_NAME)
+      .update(OPENAPI_KEY_NAME, input, vscode.ConfigurationTarget.Global);
+  }
+
+  return true;
 }
 
 function getGitRepository() {
@@ -27,7 +58,7 @@ function getGitRepository() {
 
 async function generateCommitMessage(gitDiff: string | undefined) {
   const configuration = new Configuration({
-    apiKey: vscode.workspace.getConfiguration('generateCommitMessage').get('openaiApiKey'),
+    apiKey: vscode.workspace.getConfiguration(CONFIGURATION_NAME).get(OPENAPI_KEY_NAME),
   });
 
   const openai = new OpenAIApi(configuration);
