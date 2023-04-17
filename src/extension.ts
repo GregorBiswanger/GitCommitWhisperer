@@ -8,7 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.generateCommitMessage', async () => {
     if (await isOpenIdKeyAvailableInSettings()) {
       const gitRepository = getGitRepository();
-      const gitDiff = await gitRepository?.diff(true);
+      const gitDiff = await getGitDiff(gitRepository);
       const message = await generateCommitMessage(gitDiff);
       await openSourceControlView();
       writeCommitMessageToInputBox(gitRepository, message);
@@ -27,22 +27,16 @@ async function isOpenIdKeyAvailableInSettings() {
   return !!openaiApiKey;
 }
 
-async function promptAndSaveOpenIdKey() {
-  const input = await vscode.window.showInputBox({
-    prompt: 'Please enter your OpenID key:',
-    ignoreFocusOut: true,
-  });
+async function getGitDiff(gitRepository: Repository | undefined) {
+  await gitRepository?.status();
+  let hasStagedChanges = false;
 
-  if (input === undefined || input.trim() === '') {
-    vscode.window.showErrorMessage('No OpenID key was entered. The extension will not run.');
-    return false;
-  } else {
-    await vscode.workspace
-      .getConfiguration(CONFIGURATION_NAME)
-      .update(OPENAPI_KEY_NAME, input, vscode.ConfigurationTarget.Global);
+  const stagedChanges = await gitRepository?.diff(true);
+  if (stagedChanges) {
+    hasStagedChanges = true;
   }
 
-  return true;
+  return hasStagedChanges ? stagedChanges : await gitRepository?.diff(false);
 }
 
 function getGitRepository() {
@@ -53,7 +47,14 @@ function getGitRepository() {
     return;
   }
 
-  return git.getAPI(1).repositories[0];
+  const gitRepository = git.getAPI(1).repositories[0];
+
+  if (!gitRepository) {
+    vscode.window.showErrorMessage('Git repository not found');
+    return;
+  }
+
+  return gitRepository;
 }
 
 async function generateCommitMessage(gitDiff: string | undefined) {
@@ -84,7 +85,6 @@ function getCustomPrompt() {
 }
 
 async function openSourceControlView() {
-  await vscode.commands.executeCommand('git.stageAll');
   await vscode.commands.executeCommand('workbench.view.scm');
 }
 
@@ -92,6 +92,24 @@ function writeCommitMessageToInputBox(gitRepository: Repository | undefined, mes
   if (gitRepository) {
     gitRepository.inputBox.value = message || 'No commit message generated';
   }
+}
+
+async function promptAndSaveOpenIdKey() {
+  const input = await vscode.window.showInputBox({
+    prompt: 'Please enter your OpenID key:',
+    ignoreFocusOut: true,
+  });
+
+  if (input === undefined || input.trim() === '') {
+    vscode.window.showErrorMessage('No OpenID key was entered. The extension will not run.');
+    return false;
+  } else {
+    await vscode.workspace
+      .getConfiguration(CONFIGURATION_NAME)
+      .update(OPENAPI_KEY_NAME, input, vscode.ConfigurationTarget.Global);
+  }
+
+  return true;
 }
 
 export function deactivate() {}
