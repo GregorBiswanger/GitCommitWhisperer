@@ -9,9 +9,14 @@ export function activate(context: vscode.ExtensionContext) {
     if (await isOpenIdKeyAvailableInSettings()) {
       const gitRepository = getGitRepository();
       const gitDiff = await getGitDiff(gitRepository);
-      const message = await generateCommitMessage(gitDiff);
-      await openSourceControlView();
-      writeCommitMessageToInputBox(gitRepository, message);
+
+      if (isDiffAvailable(gitDiff)) { 
+        const message = await generateCommitMessage(gitDiff);
+        await openSourceControlView();
+        writeCommitMessageToInputBox(gitRepository, message);
+      } else {
+        vscode.window.showErrorMessage('No changes detected. Unable to generate a commit message without any modifications.');
+      }
     } else {
       if (await promptAndSaveOpenIdKey()) {
         vscode.commands.executeCommand('extension.generateCommitMessage');
@@ -25,18 +30,6 @@ export function activate(context: vscode.ExtensionContext) {
 async function isOpenIdKeyAvailableInSettings() {
   const openaiApiKey = vscode.workspace.getConfiguration(CONFIGURATION_NAME).get(OPENAPI_KEY_NAME);
   return !!openaiApiKey;
-}
-
-async function getGitDiff(gitRepository: Repository | undefined) {
-  await gitRepository?.status();
-  let hasStagedChanges = false;
-
-  const stagedChanges = await gitRepository?.diff(true);
-  if (stagedChanges) {
-    hasStagedChanges = true;
-  }
-
-  return hasStagedChanges ? stagedChanges : await gitRepository?.diff(false);
 }
 
 function getGitRepository() {
@@ -55,6 +48,22 @@ function getGitRepository() {
   }
 
   return gitRepository;
+}
+
+async function getGitDiff(gitRepository: Repository | undefined) {
+  await gitRepository?.status();
+  let hasStagedChanges = false;
+
+  const stagedChanges = await gitRepository?.diff(true);
+  if (stagedChanges) {
+    hasStagedChanges = true;
+  }
+
+  return hasStagedChanges ? stagedChanges : await gitRepository?.diff(false);
+}
+
+function isDiffAvailable(gitDiff: string | undefined) {
+  return !!gitDiff;
 }
 
 async function generateCommitMessage(gitDiff: string | undefined) {
