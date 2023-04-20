@@ -3,6 +3,11 @@
   "displayName": "Git Commit Whisperer",
   "description": "Git Commit Whisperer generate Git commit messages in Visual Studio Code using OpenAI technology.",
   "version": "1.0.0",
+  "publisher": "GregorBiswanger",
+  "author": {
+    "name": "Gregor Biswanger - http://about.me/gregor.biswanger"
+  },
+  "icon": "images/git-commit-whisperer-128x128.png",
   "keywords": [
 		"git",
 		"commit",
@@ -10,6 +15,14 @@
 		"chatgpt",
 		"openai"
 	],
+  "galleryBanner": {
+    "color": "#007ACC",
+    "theme": "light"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GregorBiswanger/VSCode-json2ts.git"
+  },
   "engines": {
     "vscode": "^1.77.0"
   },
