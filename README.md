@@ -1,71 +1,60 @@
-# commitwhisperer README
+# Git Commit Whisperer
 
-This is the README for your extension "commitwhisperer". After writing up a brief description, we recommend including the following sections.
+**Git Commit Whisperer** is a Visual Studio Code extension that helps you generate git commit messages using OpenAI's GPT-3 (ChatGPT).
+
+**WARNING** This extension transmits your git diff to OpenAI-API. Using this extension on confidential repositories is not advised, as it could potentially breach your NDA.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Automatically generate git commit messages based on the diff of your changes
+- Customize commit types using emojis
+- Configure custom prompts for OpenAI's GPT-3
+- Quick selection of commit types
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- An OpenAI API key is required to use this extension
 
-## Extension Settings
+## Installation
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Install the extension from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=GregorBiswanger.git-commit-whisperer).
 
-For example:
+## Usage
 
-This extension contributes the following settings:
+1. Make sure you have a valid OpenAI API key, which can be obtained [here](https://platform.openai.com/).
+2. Configure the extension with your OpenAI API key:
+   - Either enter it directly in the settings (`generateCommitMessage.openaiApiKey`)
+   - Or, the extension will prompt you to enter your API key the first time you run the command
+3. Execute the `Generate Commit Message` command from the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`).
+4. If there are staged changes, select a commit type (or choose "Auto Detection") and let the extension generate a commit message for you.
+5. The generated commit message will be placed in the Source Control input box.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Configuration
+
+You can customize the behavior of the Git Commit Whisperer by modifying the following settings:
+
+```json
+{
+  "generateCommitMessage.openaiApiKey": "your-openai-api-key",
+  "generateCommitMessage.commitTypes": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"],
+  "generateCommitMessage.useEmojiForCommitType": false,
+  "generateCommitMessage.commitMessagePrompt": "your custom prompt"
+}
+```
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- The extension might not work properly if the Git diff is very large or if there are too many changes.
+- The commit message length might exceed the recommended 50 characters in some cases.
 
-## Release Notes
+## Contributing
 
-Users appreciate release notes as you update your extension.
+If you have any suggestions or find any bugs, please open an issue on the [GitHub repository](https://github.com/GregorBiswanger/git-commit-whisperer).
 
-### 1.0.0
+<!-- ## Release Notes
 
-Initial release of ...
+For the release notes, please refer to the [CHANGELOG](https://github.com/GregorBiswanger/git-commit-whisperer/blob/main/CHANGELOG.md). -->
 
-### 1.0.1
+## License
 
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+This extension is licensed under the [MIT License](https://github.com/GregorBiswanger/git-commit-whisperer/blob/main/LICENSE).
