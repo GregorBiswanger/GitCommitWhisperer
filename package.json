@@ -1,13 +1,21 @@
 {
-  "name": "commitwhisperer",
-  "displayName": "CommitWhisperer",
-  "description": "CommitWhisperer creates concise Git commit messages in Visual Studio Code using OpenAI technology.",
-  "version": "0.0.1",
+  "name": "gitcommitwhisperer",
+  "displayName": "Git Commit Whisperer",
+  "description": "Git Commit Whisperer generate Git commit messages in Visual Studio Code using OpenAI technology.",
+  "version": "1.0.0",
+  "keywords": [
+		"git",
+		"commit",
+		"generator",
+		"chatgpt",
+		"openai"
+	],
   "engines": {
     "vscode": "^1.77.0"
   },
   "categories": [
-    "Other"
+    "Other",
+		"SCM Providers"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -20,7 +28,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "Generate Commit Message",
+      "title": "Git Commit Whisperer",
       "properties": {
         "generateCommitMessage.openaiApiKey": {
           "type": "string",
@@ -39,6 +47,11 @@
           },
           "default": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"],
           "description": "List of Git commit types to choose from when generating commit messages."
+        },
+        "generateCommitMessage.useEmojiForCommitType": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use emoji for the commit type"
         }
       }
     }

@@ -2,14 +2,14 @@ import { GitExtension, Repository } from './git';
 import * as vscode from 'vscode';
 
 export async function getGitRepository() {
-  const gitExtension = findGitExtension();
+  const gitExtension = getGitExtension();
 
-  if (gitExtensionAvailable(gitExtension)) {
-    return findFirstRepository(gitExtension);
+  if (isGitExtensionAvailable(gitExtension)) {
+    return firstRepository(gitExtension);
   }
 }
 
-function findGitExtension() {
+function getGitExtension() {
   const git = vscode.extensions.getExtension<GitExtension>('vscode.git')?.exports;
 
   if (!git) {
@@ -19,11 +19,11 @@ function findGitExtension() {
   return git;
 }
 
-function gitExtensionAvailable(gitExtension: GitExtension | undefined) {
+function isGitExtensionAvailable(gitExtension: GitExtension | undefined) {
   return gitExtension !== undefined;
 }
 
-function findFirstRepository(git: GitExtension | undefined) {
+function firstRepository(git: GitExtension | undefined) {
   const gitRepository = git?.getAPI(1).repositories[0];
 
   if (!gitRepository) {
@@ -35,21 +35,12 @@ function findFirstRepository(git: GitExtension | undefined) {
 
 export async function getGitDiff(gitRepository: Repository | undefined) {
   await gitRepository?.status();
-  const hasStagedChanges = await hasStagedChangesInRepository(gitRepository);
 
-  return getDiffBasedOnStagedStatus(gitRepository, hasStagedChanges);
-}
-
-async function hasStagedChangesInRepository(gitRepository: Repository | undefined): Promise<boolean> {
   const stagedChanges = await gitRepository?.diff(true);
-  return !!stagedChanges;
-}
 
-async function getDiffBasedOnStagedStatus(gitRepository: Repository | undefined,  hasStagedChanges: boolean) {
-  if (hasStagedChanges) {
-    return await gitRepository?.diff(true);
+  if (stagedChanges) { 
+    return stagedChanges;
   }
 
   return await gitRepository?.diff(false);
 }
-

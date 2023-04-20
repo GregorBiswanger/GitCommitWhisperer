@@ -3,10 +3,16 @@ import * as vscode from 'vscode';
 const CONFIGURATION_NAME = 'generateCommitMessage';
 const OPENAPI_KEY_NAME = 'openaiApiKey';
 const COMMIT_TYPES = 'commitTypes';
+const USE_EMOJI_FOR_COMMIT_TYPE = 'useEmojiForCommitType';
+const COMMIT_MESSAGE_PROMPT = 'commitMessagePrompt';
 
 export function isOpenIdKeyAvailableInSettings() {
-  const openaiApiKey = vscode.workspace.getConfiguration(CONFIGURATION_NAME).get(OPENAPI_KEY_NAME);
+  const openaiApiKey = vscode.workspace.getConfiguration(CONFIGURATION_NAME).get<string>(OPENAPI_KEY_NAME);
   return !!openaiApiKey;
+}
+
+export function getOpenIdKey() { 
+  return vscode.workspace.getConfiguration(CONFIGURATION_NAME).get<string>(OPENAPI_KEY_NAME);
 }
 
 export async function promptAndSaveOpenIdKey() {
@@ -42,9 +48,17 @@ export async function selectCommitType() {
 }
 
 function generateCommitTypeMessage(selectedType: string | undefined) {
-  if (selectedType === 'Auto Detection' || !selectedType) {
+  if (selectedType === 'Auto Detection' || selectedType === undefined) {
     return '';
   }
 
-  return `Use the following commit type for this message: ${selectedType}.`;
+  return `Use the following commit type: ${selectedType}.`;
+}
+
+export function getCustomPrompt() {
+  return vscode.workspace.getConfiguration(CONFIGURATION_NAME).get<string>(COMMIT_MESSAGE_PROMPT) || '';
+}
+
+export function isEmojiForCommitTypeEnabled(): boolean {
+  return vscode.workspace.getConfiguration(CONFIGURATION_NAME).get<boolean>(USE_EMOJI_FOR_COMMIT_TYPE) || false;
 }
