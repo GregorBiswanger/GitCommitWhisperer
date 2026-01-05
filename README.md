@@ -49,11 +49,7 @@ You can customize the behavior of the Git Commit Whisperer by modifying the foll
 
 ## Contributing
 
-If you have any suggestions or find any bugs, please open an issue on the [GitHub repository](https://github.com/GregorBiswanger/GitCommitWhisperer).
-
-<!-- ## Release Notes
-
-For the release notes, please refer to the [CHANGELOG](https://github.com/GregorBiswanger/GitCommitWhisperer/blob/main/CHANGELOG.md). -->
+If you have any suggestions or find any bugs, please open an issue on the [GitHub repository](https://github.com/GregorBiswanger/GitCommitWhisperer/issues).
 
 ## License
 
