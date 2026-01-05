@@ -49,12 +49,8 @@ You can customize the behavior of the Git Commit Whisperer by modifying the foll
 
 ## Contributing
 
-If you have any suggestions or find any bugs, please open an issue on the [GitHub repository](https://github.com/GregorBiswanger/git-commit-whisperer).
-
-<!-- ## Release Notes
-
-For the release notes, please refer to the [CHANGELOG](https://github.com/GregorBiswanger/git-commit-whisperer/blob/main/CHANGELOG.md). -->
+If you have any suggestions or find any bugs, please open an issue on the [GitHub repository](https://github.com/GregorBiswanger/GitCommitWhisperer/issues).
 
 ## License
 
-This extension is licensed under the [MIT License](https://github.com/GregorBiswanger/git-commit-whisperer/blob/main/LICENSE).
+This extension is licensed under the [MIT License](https://github.com/GregorBiswanger/GitCommitWhisperer/blob/main/LICENSE).
